@@ -1,0 +1,61 @@
+{% extends "public/base.html" %}
+{% block title %}Вхід — Ozon Analytics{% endblock %}
+{% block meta_description %}JWT-вхід через Djoser.{% endblock %}
+{% block content %}
+<section class="max-w-md mx-auto bg-white p-6 rounded-xl shadow space-y-4">
+  <h1 class="text-2xl font-bold">Вхід</h1>
+
+  <div id="alert" class="hidden p-3 rounded-lg"></div>
+
+  <form id="loginForm" class="space-y-3">
+    {% csrf_token %}
+    <input type="text" name="username" placeholder="Логін" class="w-full border rounded-lg p-3" required>
+    <input type="password" name="password" placeholder="Пароль" class="w-full border rounded-lg p-3" required>
+    <button class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg" type="submit">Увійти</button>
+  </form>
+
+  <p class="text-sm text-gray-600">Ще немає акаунта? <a class="text-blue-600 underline" href="{% url 'public_register' %}">Зареєструйтесь</a>.</p>
+
+  <script>
+    const form = document.getElementById('loginForm');
+    const alertBox = document.getElementById('alert');
+
+    function showAlert(msg, ok=false) {
+      alertBox.textContent = msg;
+      alertBox.className = "p-3 rounded-lg " + (ok ? "bg-green-50 text-green-700 border border-green-200" : "bg-red-50 text-red-700 border border-red-200");
+      alertBox.classList.remove('hidden');
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      alertBox.classList.add('hidden');
+
+      const data = {
+        username: form.username.value.trim(),
+        password: form.password.value
+      };
+
+      try {
+        const resp = await fetch("/auth/jwt/create", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify(data),
+        });
+        const json = await resp.json();
+
+        if (!resp.ok) {
+          showAlert(json?.detail || JSON.stringify(json));
+          return;
+        }
+
+        localStorage.setItem("access", json.access);
+        localStorage.setItem("refresh", json.refresh);
+        showAlert("Вхід виконано. Переходимо у кабінет…", true);
+        setTimeout(() => { window.location.href = "/app/default/dashboard/"; }, 600);
+      } catch (err) {
+        showAlert(err.message || "Помилка мережі");
+      }
+    });
+  </script>
+</section>
+{% endblock %}

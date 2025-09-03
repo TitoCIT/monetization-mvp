@@ -1,0 +1,13 @@
+{% extends "app/base_app.html" %}
+{% block title %}Customers — {{ org }}{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-bold mb-4">Customers</h1>
+<table class="min-w-full bg-white rounded-xl overflow-hidden shadow">
+  <thead class="bg-gray-100 text-left">
+    <tr><th class="p-3">Name</th><th class="p-3">Email</th><th class="p-3">Phone</th></tr>
+  </thead>
+  <tbody>
+    <tr><td class="p-3 text-gray-500" colspan="3">Дані з'являться після імпорту/створення.</td></tr>
+  </tbody>
+</table>
+{% endblock %}

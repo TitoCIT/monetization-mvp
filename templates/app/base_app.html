@@ -1,0 +1,56 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow">
+  <title>{% block title %}Кабінет — {{ org }}{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800">
+  <header class="bg-white shadow">
+    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+      <div class="text-xl font-semibold">Кабінет: {{ org }}</div>
+      <nav class="space-x-4 flex items-center">
+        <a class="hover:text-blue-600" href="{% url 'app_dashboard' org=org %}">Dashboard</a>
+        <a class="hover:text-blue-600" href="{% url 'app_customers' org=org %}">Customers</a>
+        <a class="hover:text-blue-600" href="{% url 'app_products' org=org %}">Products</a>
+        <button id="logoutBtn" class="ml-4 px-3 py-1 border rounded-lg hidden">Вийти</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Auth banner -->
+  <div id="authBanner" class="hidden bg-yellow-50 border-b border-yellow-200">
+    <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+      <p class="text-yellow-800">Ви не авторизовані. Деякі дії можуть бути недоступні.</p>
+      <a href="{% url 'public_login' %}" class="px-3 py-1 bg-blue-600 text-white rounded-lg">Увійти</a>
+    </div>
+  </div>
+
+  <main class="container mx-auto px-4 py-6">
+    {% block content %}{% endblock %}
+  </main>
+
+  <script>
+    (function () {
+      const access = localStorage.getItem("access");
+      const banner = document.getElementById("authBanner");
+      const logoutBtn = document.getElementById("logoutBtn");
+
+      if (!access) {
+        banner.classList.remove("hidden");
+      } else {
+        logoutBtn.classList.remove("hidden");
+      }
+
+      logoutBtn?.addEventListener("click", () => {
+        localStorage.removeItem("access");
+        localStorage.removeItem("refresh");
+        window.location.href = "{% url 'public_login' %}";
+      });
+    })();
+  </script>
+</body>
+</html>

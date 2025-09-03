@@ -1,0 +1,58 @@
+@host = http://127.0.0.1:8000
+
+### (опційно) Створити звичайного користувача
+POST {{host}}/auth/users/
+Content-Type: application/json
+
+{
+  "username": "oleg",
+  "password": "StrongPass123",
+  "email": "oleg@example.com"
+}
+
+###
+
+# @name login
+POST {{host}}/auth/jwt/create
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "Admin12345"
+}
+
+###
+
+# @name createCategory
+POST {{host}}/api/categories/
+Authorization: Bearer {{login.response.body.$.access}}
+Content-Type: application/json
+
+{
+  "name": "Робота",
+  "color": "#2b8a3e"
+}
+
+###
+
+# @name createEntry
+POST {{host}}/api/entries/
+Authorization: Bearer {{login.response.body.$.access}}
+Content-Type: application/json
+
+{
+  "category": {{createCategory.response.body.$.id}},
+  "started_at": "2025-08-28T10:00:00Z",
+  "ended_at": "2025-08-28T12:30:00Z",
+  "note": "Фокус робота"
+}
+
+###
+
+GET {{host}}/api/categories/
+Authorization: Bearer {{login.response.body.$.access}}
+
+###
+
+GET {{host}}/api/entries/
+Authorization: Bearer {{login.response.body.$.access}}
